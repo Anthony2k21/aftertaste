@@ -38,7 +38,7 @@ export function AccountBar({ ready, user }: AccountBarProps) {
     setNotice(null)
     const { error } = await supabase.auth.signInWithOtp({
       email: trimmed,
-      options: { emailRedirectTo: window.location.origin },
+      options: { emailRedirectTo: window.location.origin + import.meta.env.BASE_URL },
     })
     setSending(false)
     if (error) {
