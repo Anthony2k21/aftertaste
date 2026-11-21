@@ -40,15 +40,15 @@ export function tierFor(total: number): TierName {
 export function tierClass(tier: TierName): string {
   switch (tier) {
     case "Must-rewatch":
-      return "bg-ink text-paper"
+      return "border border-clay bg-clay text-cream"
     case "Great":
-      return "bg-bark text-paper"
+      return "border border-clay text-clay"
     case "Decent":
-      return "bg-clay text-paper"
+      return "border border-ink/70 text-ink"
     case "Meh":
-      return "bg-linen text-ink"
+      return "border border-line text-bark"
     case "Skip":
-      return "bg-paper text-bark ring-1 ring-ink/15"
+      return "border border-dashed border-line text-bark"
   }
 }
 

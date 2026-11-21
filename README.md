@@ -2,6 +2,8 @@
 
 A small way to rate a video. Title and link are optional. Seven ratings, each from 1 to 5, become one score out of 100.
 
+The look is a dark, square, terminal-style UI: near-black panels with 1px rules, an amber accent, zero rounded corners, Space Grotesk uppercase headings and JetBrains Mono for everything else, blocky 1–5 rating buttons, and a bracketed, segmented score readout. It is built to work on a phone as well as a desktop.
+
 Signed-in ratings sync across devices through Supabase. With no Supabase env vars, or while signed out, ratings stay in this browser’s `localStorage`. After the first sign-in, the app offers once to copy those browser ratings onto the account.
 
 Anthony creates the Supabase project and connects the repo to Vercel. Both need his accounts. The steps below are the whole setup.

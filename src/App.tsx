@@ -204,21 +204,27 @@ export default function App() {
 
   return (
     <div className="min-h-dvh bg-cream text-ink">
-      <main className="mx-auto flex w-full max-w-2xl flex-col gap-14 px-4 py-12 sm:px-6 sm:py-20">
-        <header className="flex flex-col gap-4">
-          <p className="text-xs font-medium tracking-[0.22em] text-clay uppercase">
-            {signedIn ? "Synced ratings" : "Private ratings"}
-          </p>
-          <h1 className="text-5xl leading-none font-medium sm:text-6xl">Aftertaste</h1>
-          <p className="max-w-md text-lg leading-relaxed text-bark">
-            A quiet score for whether a video was worth the time, and how it left you.
+      <main className="mx-auto flex w-full max-w-2xl flex-col gap-12 px-4 py-10 sm:px-6 sm:py-16">
+        <header className="flex flex-col gap-5 border-b border-line pb-8">
+          <div className="flex items-center justify-between gap-3 text-[11px] font-semibold tracking-[0.2em] uppercase">
+            <p className="flex items-center gap-2 text-clay">
+              <span className="inline-block size-2 bg-clay" aria-hidden="true" />
+              {signedIn ? "Synced ratings" : "Private ratings"}
+            </p>
+            <p className="text-bark tabular-nums">SYS/v2</p>
+          </div>
+          <h1 className="text-5xl leading-none tracking-[-0.03em] sm:text-7xl">
+            Aftertaste<span className="cursor-blink ml-1 text-clay" aria-hidden="true">_</span>
+          </h1>
+          <p className="max-w-md text-sm leading-relaxed text-bark sm:text-base">
+            <span className="text-clay">&gt;</span> A quiet score for whether a video was worth the time, and how it left you.
           </p>
         </header>
 
         {configured ? <AccountBar ready={authReady} user={user} /> : null}
 
         {problem ? (
-          <p className="rounded-2xl bg-linen px-4 py-3 text-sm text-ink" role="alert">
+          <p className="border border-destructive/60 bg-destructive/10 px-4 py-3 text-sm text-ink" role="alert">
             {problem}
           </p>
         ) : null}
@@ -251,7 +257,10 @@ export default function App() {
           onReplace={replaceEntries}
         />
 
-        <footer className="text-sm leading-relaxed text-bark">{footer}</footer>
+        <footer className="border-t border-line pt-6 text-xs leading-relaxed text-bark">
+          <span className="text-clay">// </span>
+          {footer}
+        </footer>
       </main>
     </div>
   )

@@ -60,18 +60,18 @@ export function AccountBar({ ready, user }: AccountBarProps) {
   }
 
   return (
-    <section className="rounded-3xl bg-paper px-5 py-5 ring-1 ring-ink/10 sm:px-6">
+    <section className="border border-line bg-paper px-5 py-5 sm:px-6">
       {!ready ? (
         <p className="text-sm text-bark">Checking sign-in…</p>
       ) : user ? (
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-base text-bark">
+          <p className="text-sm text-bark">
             Signed in as <span className="font-medium text-ink">{user.email || "your account"}</span>
           </p>
           <Button
             type="button"
             variant="outline"
-            className="h-11 rounded-full bg-paper px-5"
+            className="h-11 bg-paper px-5"
             onClick={() => void signOut()}
             disabled={signingOut}
           >
@@ -80,14 +80,14 @@ export function AccountBar({ ready, user }: AccountBarProps) {
         </div>
       ) : sentTo ? (
         <div className="flex flex-col gap-2">
-          <p className="text-base text-ink">Check {sentTo} for a sign-in link.</p>
+          <p className="text-sm text-ink">Check {sentTo} for a sign-in link.</p>
           <p className="text-sm leading-relaxed text-bark">
             Open it in this browser. The link signs this device into your account.
           </p>
           <Button
             type="button"
             variant="ghost"
-            className="mt-1 h-10 w-fit rounded-full px-3 text-bark"
+            className="mt-1 h-10 w-fit px-3 text-bark"
             onClick={() => setSentTo(null)}
           >
             Use a different email
@@ -96,7 +96,7 @@ export function AccountBar({ ready, user }: AccountBarProps) {
       ) : (
         <form className="flex flex-col gap-4" onSubmit={onSubmit}>
           <div>
-            <h2 className="text-2xl leading-tight font-medium">Sync across devices</h2>
+            <h2 className="text-xl leading-tight sm:text-2xl">Sync across devices</h2>
             <p className="mt-1 text-sm leading-relaxed text-bark">
               Email yourself a sign-in link. Until you open it, ratings stay in this browser.
             </p>
@@ -113,13 +113,13 @@ export function AccountBar({ ready, user }: AccountBarProps) {
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 placeholder="you@example.com"
-                className="h-12 rounded-xl bg-paper px-3.5 text-base placeholder:text-clay"
+                className="h-12 bg-cream px-3.5 text-base placeholder:text-bark/60"
               />
             </div>
             <Button
               type="submit"
               disabled={sending || email.trim() === ""}
-              className="h-12 rounded-full px-5 text-base"
+              className="h-12 px-5"
             >
               {sending ? "Sending…" : "Email me a link"}
             </Button>
