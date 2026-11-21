@@ -122,7 +122,7 @@ If “How good do I feel afterwards” is 1, the rounded total is capped at 60.
 
 | Total | Tier |
 | --- | --- |
-| 90+ | Must-rewatch |
+| 90+ | Must-revisit |
 | 75–89 | Great |
 | 60–74 | Decent |
 | 40–59 | Meh |

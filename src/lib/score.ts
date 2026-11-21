@@ -1,6 +1,6 @@
 import { CRITERIA, type CriterionId, type ScoreMap } from "./criteria.ts"
 
-export type TierName = "Must-rewatch" | "Great" | "Decent" | "Meh" | "Skip"
+export type TierName = "Must-revisit" | "Great" | "Decent" | "Meh" | "Skip"
 
 export type Contribution = {
   id: CriterionId
@@ -30,7 +30,7 @@ export function formatPoints(value: number): string {
 }
 
 export function tierFor(total: number): TierName {
-  if (total >= 90) return "Must-rewatch"
+  if (total >= 90) return "Must-revisit"
   if (total >= 75) return "Great"
   if (total >= 60) return "Decent"
   if (total >= 40) return "Meh"
@@ -39,7 +39,7 @@ export function tierFor(total: number): TierName {
 
 export function tierClass(tier: TierName): string {
   switch (tier) {
-    case "Must-rewatch":
+    case "Must-revisit":
       return "border border-clay bg-clay text-cream"
     case "Great":
       return "border border-clay text-clay"

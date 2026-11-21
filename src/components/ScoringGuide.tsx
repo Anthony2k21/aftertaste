@@ -3,7 +3,7 @@ import { SectionTitle } from "@/components/SectionTitle"
 import { CRITERIA } from "@/lib/criteria"
 
 const TIERS = [
-  ["90 and above", "Must-rewatch"],
+  ["90 and above", "Must-revisit"],
   ["75–89", "Great"],
   ["60–74", "Decent"],
   ["40–59", "Meh"],

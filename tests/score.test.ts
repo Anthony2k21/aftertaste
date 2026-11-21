@@ -54,7 +54,7 @@ describe("scoreRatings", () => {
     )
     assert.equal(result.exact, 100)
     assert.equal(result.total, 100)
-    assert.equal(result.tier, "Must-rewatch")
+    assert.equal(result.tier, "Must-revisit")
     assert.equal(result.capped, false)
     assert.deepEqual(
       result.contributions.map((item) => item.points),
@@ -113,7 +113,7 @@ describe("scoreRatings", () => {
     assert.equal(result.tier, "Skip")
   })
 
-  it("lands on 90 for a must-rewatch boundary", () => {
+  it("lands on 90 for a must-revisit boundary", () => {
     const result = scoreRatings(
       scores({
         fulfilled: 5,
@@ -126,14 +126,14 @@ describe("scoreRatings", () => {
       }),
     )
     assert.equal(result.total, 90)
-    assert.equal(result.tier, "Must-rewatch")
+    assert.equal(result.tier, "Must-revisit")
   })
 })
 
 describe("tierFor", () => {
   it("follows the published cuts", () => {
-    assert.equal(tierFor(100), "Must-rewatch")
-    assert.equal(tierFor(90), "Must-rewatch")
+    assert.equal(tierFor(100), "Must-revisit")
+    assert.equal(tierFor(90), "Must-revisit")
     assert.equal(tierFor(89), "Great")
     assert.equal(tierFor(75), "Great")
     assert.equal(tierFor(74), "Decent")
