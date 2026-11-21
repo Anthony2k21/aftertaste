@@ -36,7 +36,7 @@ export function ScoringGuide() {
             ))}
           </ul>
           <p>
-            If “How good do I feel after watching” is 1, the rounded total stops at 60.
+            If “How good do I feel afterwards” is 1, the rounded total stops at 60.
           </p>
           <ul className="grid gap-2">
             {TIERS.map(([range, name]) => (

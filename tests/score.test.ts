@@ -27,6 +27,7 @@ function scores(overrides: Partial<ScoreMap> = {}): ScoreMap {
 
 function entry(partial: Partial<Entry> & Pick<Entry, "id" | "total" | "date">): Entry {
   return {
+    kind: partial.kind ?? "video",
     title: partial.title ?? "",
     url: partial.url ?? "",
     scores: partial.scores ?? scores({ feelAfter: 5, fulfilled: 5 }),
@@ -203,6 +204,24 @@ describe("parseBackup", () => {
     assert.equal(parsed.entries[0]?.id, "ok")
   })
 
+  it("treats entries saved before types existed as Video and keeps known types", () => {
+    const parsed = parseBackup([
+      { id: "old", title: "Old", url: "", date: "2026-01-02T00:00:00.000Z", scores: scores() },
+      { id: "book", kind: "book", title: "Dune", date: "2026-01-03T00:00:00.000Z", scores: scores() },
+      { id: "odd", kind: "hologram", date: "2026-01-04T00:00:00.000Z", scores: scores() },
+    ])
+    assert.equal(parsed.ok, true)
+    if (!parsed.ok) return
+    assert.deepEqual(
+      parsed.entries.map((item) => [item.id, item.kind, item.url]),
+      [
+        ["old", "video", ""],
+        ["book", "book", ""],
+        ["odd", "video", ""],
+      ],
+    )
+  })
+
   it("rejects a file that is not a backup", () => {
     assert.deepEqual(parseBackup({ hello: "nope" }), { ok: false })
     assert.deepEqual(parseBackup(null), { ok: false })
@@ -244,10 +263,10 @@ describe("mergeEntries and sort", () => {
 
 describe("describeImport", () => {
   it("talks about what actually changed", () => {
-    assert.equal(describeImport(2, 0, 0), "Added 2 videos.")
-    assert.equal(describeImport(1, 1, 1), "Added 1 video. 1 was already saved. Skipped 1 row that didn’t look like a rating.")
-    assert.equal(describeImport(0, 1, 0), "That video is already on the scoreboard.")
-    assert.equal(describeImport(0, 0, 0), "That backup doesn’t include any videos.")
+    assert.equal(describeImport(2, 0, 0), "Added 2 ratings.")
+    assert.equal(describeImport(1, 1, 1), "Added 1 rating. 1 was already saved. Skipped 1 row that didn’t look like a rating.")
+    assert.equal(describeImport(0, 1, 0), "That rating is already on the scoreboard.")
+    assert.equal(describeImport(0, 0, 0), "That backup doesn’t include any ratings.")
   })
 })
 
@@ -290,5 +309,9 @@ describe("localStorage round trip", () => {
     assert.equal(loaded[0]?.title, "Notes")
     assert.equal(loaded[0]?.total, 13)
     assert.equal(loaded[0]?.scores.attention, 2)
+    assert.equal(loaded[0]?.kind, "video")
+
+    assert.equal(storage.persistEntries([{ ...saved[0]!, kind: "music" }]), true)
+    assert.equal(storage.loadEntries()[0]?.kind, "music")
   })
 })

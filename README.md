@@ -1,6 +1,6 @@
 # Aftertaste
 
-A small way to rate a video. Title and link are optional. Seven ratings, each from 1 to 5, become one score out of 100.
+A small way to rate media and experiences: videos, music, films and TV, books, games, podcasts, real-life experiences, or anything else. Each entry has a type, shown as a tag like `[VIDEO]` on the scoreboard, where you can filter by type. Title and link are optional. Seven ratings, each from 1 to 5, become one score out of 100.
 
 The look is a dark, square, terminal-style UI: near-black panels with 1px rules, an amber accent, zero rounded corners, Space Grotesk uppercase headings and JetBrains Mono for everything else, blocky 1–5 rating buttons, and a bracketed, segmented score readout. It is built to work on a phone as well as a desktop.
 
@@ -97,6 +97,7 @@ npm run preview
 - Signed out, or Supabase not configured: save, delete, clear, and JSON import/export use this browser only.
 - Signed in: those actions read and write the `ratings` table. The scoreboard is the account, not the browser cache.
 - The first time an account signs in on a browser that already has local ratings, the app asks once to add them to the account. **Add to my account** copies them. **Not now** leaves them local and does not ask again on this browser. JSON import still works later.
+- The type is stored inside the `scores` JSON as `kind`, so the table needs no new column. Ratings saved before types existed (in the browser or in Supabase) load as Video.
 - Totals are calculated again when rows are loaded, so a stored `total` cannot drift from the formula.
 
 ## Scoring
@@ -110,14 +111,14 @@ score = round(sum of weight × (rating − 1) / 4)
 | Criterion | Weight |
 | --- | --- |
 | How fulfilled do I feel | 20% |
-| How good do I feel after watching | 20% |
-| Would I watch it again | 15% |
+| How good do I feel afterwards | 20% |
+| Would I do it again | 15% |
 | Did I learn something | 15% |
 | Worth the time | 15% |
 | Held my attention | 10% |
 | Will I act on it | 5% |
 
-If “How good do I feel after watching” is 1, the rounded total is capped at 60.
+If “How good do I feel afterwards” is 1, the rounded total is capped at 60.
 
 | Total | Tier |
 | --- | --- |

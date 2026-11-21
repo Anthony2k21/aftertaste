@@ -16,7 +16,9 @@ export function entryToRow(entry: Entry, userId: string) {
     user_id: userId,
     title: entry.title,
     url: entry.url,
-    scores: entry.scores,
+    // There is no kind column; the type rides inside the scores JSON so the
+    // existing table works unchanged. Rows saved before types existed read as Video.
+    scores: { ...entry.scores, kind: entry.kind },
     total: entry.total,
     created_at: entry.date,
   }
@@ -26,6 +28,10 @@ export function entriesFromRows(rows: RatingRow[]): { entries: Entry[]; skipped:
   const parsed = parseBackup({
     entries: rows.map((row) => ({
       id: row.id,
+      kind:
+        row.scores && typeof row.scores === "object"
+          ? (row.scores as { kind?: unknown }).kind
+          : undefined,
       title: row.title ?? "",
       url: row.url ?? "",
       date: row.created_at,

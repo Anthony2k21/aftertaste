@@ -14,6 +14,7 @@ import {
   type DraftRatings,
 } from "@/lib/criteria"
 import type { Entry } from "@/lib/entries"
+import { DEFAULT_KIND, KINDS, type Kind } from "@/lib/kinds"
 import { formatPoints, scoreRatings, tierClass } from "@/lib/score"
 
 type RatingFormProps = {
@@ -24,6 +25,7 @@ type RatingFormProps = {
 
 export function RatingForm({ onSave, savedLabel, holdMessage = null }: RatingFormProps) {
   const titleRef = useRef<HTMLInputElement>(null)
+  const [kind, setKind] = useState<Kind>(DEFAULT_KIND)
   const [title, setTitle] = useState("")
   const [url, setUrl] = useState("")
   const [ratings, setRatings] = useState<DraftRatings>(() => emptyRatings())
@@ -46,6 +48,7 @@ export function RatingForm({ onSave, savedLabel, holdMessage = null }: RatingFor
     try {
       const error = await onSave({
         id: crypto.randomUUID(),
+        kind,
         title: title.trim(),
         url: url.trim(),
         date: new Date().toISOString(),
@@ -69,33 +72,37 @@ export function RatingForm({ onSave, savedLabel, holdMessage = null }: RatingFor
   return (
     <Card className="shadow-none [--card-spacing:--spacing(5)] sm:[--card-spacing:--spacing(8)]">
       <CardHeader>
-        <SectionTitle index="01">Rate a video</SectionTitle>
+        <SectionTitle index="01">Rate something</SectionTitle>
         <p className="mt-1 text-sm leading-relaxed text-bark">
-          Title and link can stay blank. The score comes from the seven ratings.
+          Anything you watched, heard, read, played or lived. Title and link can stay blank; the score comes from the seven ratings.
         </p>
       </CardHeader>
       <CardContent>
         <form className="flex flex-col gap-8" onSubmit={onSubmit} noValidate>
           <div className="grid gap-5">
+            <KindPicker value={kind} onChange={(next) => {
+              setKind(next)
+              setNotice(null)
+            }} />
             <div className="grid gap-2">
-              <Label htmlFor="video-title">Title (optional)</Label>
+              <Label htmlFor="entry-title">Title (optional)</Label>
               <Input
                 ref={titleRef}
-                id="video-title"
+                id="entry-title"
                 value={title}
                 onChange={(event) => {
                   setTitle(event.target.value)
                   setNotice(null)
                 }}
-                placeholder="A film, a talk, a clip"
+                placeholder="An album, a book, a night out"
                 autoComplete="off"
                 className="h-12 bg-cream px-3.5 text-base placeholder:text-bark/60"
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="video-url">Link (optional)</Label>
+              <Label htmlFor="entry-url">Link (optional)</Label>
               <Input
-                id="video-url"
+                id="entry-url"
                 value={url}
                 onChange={(event) => {
                   setUrl(event.target.value)
@@ -325,6 +332,65 @@ function SegmentBar({ value }: { value: number }) {
       {Array.from({ length: 20 }, (_, index) => (
         <span key={index} className={index < lit ? "h-3 bg-clay" : "h-3 bg-linen"} />
       ))}
+    </div>
+  )
+}
+
+function KindPicker({ value, onChange }: { value: Kind; onChange: (kind: Kind) => void }) {
+  const groupRef = useRef<HTMLDivElement>(null)
+
+  function choose(index: number) {
+    const next = KINDS[(index + KINDS.length) % KINDS.length]
+    onChange(next.id)
+    requestAnimationFrame(() => {
+      groupRef.current?.querySelector<HTMLButtonElement>(`[data-kind="${next.id}"]`)?.focus()
+    })
+  }
+
+  function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+    const forward = event.key === "ArrowRight" || event.key === "ArrowDown"
+    const back = event.key === "ArrowLeft" || event.key === "ArrowUp"
+    if (!forward && !back) return
+    event.preventDefault()
+    const current = KINDS.findIndex((kind) => kind.id === value)
+    choose(current + (forward ? 1 : -1))
+  }
+
+  return (
+    <div className="grid gap-2">
+      <p id="entry-kind-label" className="text-[11px] leading-none font-semibold tracking-[0.18em] text-bark uppercase">
+        Type
+      </p>
+      <div
+        ref={groupRef}
+        role="radiogroup"
+        aria-labelledby="entry-kind-label"
+        className="grid grid-cols-4 gap-1"
+        onKeyDown={onKeyDown}
+      >
+        {KINDS.map((kind) => {
+          const selected = kind.id === value
+          return (
+            <Button
+              key={kind.id}
+              type="button"
+              role="radio"
+              aria-checked={selected}
+              tabIndex={selected ? 0 : -1}
+              data-kind={kind.id}
+              variant={selected ? "default" : "outline"}
+              onClick={() => onChange(kind.id)}
+              className={
+                selected
+                  ? "h-10 min-w-0 px-1 text-[10px] tracking-[0.08em]"
+                  : "h-10 min-w-0 border-line bg-cream px-1 text-[10px] tracking-[0.08em] text-bark hover:text-ink"
+              }
+            >
+              {kind.label}
+            </Button>
+          )
+        })}
+      </div>
     </div>
   )
 }

@@ -217,7 +217,7 @@ export default function App() {
             Aftertaste<span className="cursor-blink ml-1 text-clay" aria-hidden="true">_</span>
           </h1>
           <p className="max-w-md text-sm leading-relaxed text-bark sm:text-base">
-            <span className="text-clay">&gt;</span> A quiet score for whether a video was worth the time, and how it left you.
+            <span className="text-clay">&gt;</span> A quiet score for whatever you watch, hear, read, play or live: was it worth the time, and how did it leave you.
           </p>
         </header>
 
@@ -250,8 +250,8 @@ export default function App() {
           storageLabel={signedIn ? "your account" : "this browser"}
           emptyHint={
             signedIn
-              ? "Rate a video and it will sync to your account, highest score first."
-              : "Rate a video and it will land here, highest score first."
+              ? "Rate something and it will sync to your account, highest score first."
+              : "Rate something and it will land here, highest score first."
           }
           onDelete={removeEntry}
           onReplace={replaceEntries}

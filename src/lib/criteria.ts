@@ -7,14 +7,14 @@ export const CRITERIA = [
   },
   {
     id: "feelAfter",
-    label: "How good do I feel after watching",
+    label: "How good do I feel afterwards",
     short: "Feel after",
     weight: 20,
   },
   {
     id: "watchAgain",
-    label: "Would I watch it again",
-    short: "Watch again",
+    label: "Would I do it again",
+    short: "Do again",
     weight: 15,
   },
   {

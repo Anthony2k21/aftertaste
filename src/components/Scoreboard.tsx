@@ -26,6 +26,7 @@ import {
   type Entry,
   type SortKey,
 } from "@/lib/entries"
+import { KINDS, kindLabel, type Kind } from "@/lib/kinds"
 import { tierClass, tierFor } from "@/lib/score"
 
 type ScoreboardProps = {
@@ -47,9 +48,16 @@ export function Scoreboard({
 }: ScoreboardProps) {
   const fileRef = useRef<HTMLInputElement>(null)
   const [sort, setSort] = useState<SortKey>("score")
+  const [filter, setFilter] = useState<Kind | "all">("all")
   const [message, setMessage] = useState<string | null>(null)
   const [pending, setPending] = useState(false)
-  const visible = sortEntries(entries, sort)
+  const presentKinds = KINDS.filter((kind) => entries.some((entry) => entry.kind === kind.id))
+  const activeFilter =
+    filter !== "all" && presentKinds.some((kind) => kind.id === filter) ? filter : "all"
+  const visible = sortEntries(
+    activeFilter === "all" ? entries : entries.filter((entry) => entry.kind === activeFilter),
+    sort,
+  )
 
   async function run(action: () => Promise<void> | void, success: string) {
     setPending(true)
@@ -107,10 +115,10 @@ export function Scoreboard({
             <p className="mt-1.5 text-[11px] font-semibold tracking-[0.16em] text-bark uppercase">
               {entries.length === 0
                 ? "Nothing saved yet"
-                : `${entries.length} saved · ${sort === "score" ? "highest score first" : "newest first"}`}
+                : `${activeFilter === "all" ? entries.length : `${visible.length} of ${entries.length}`} saved · ${sort === "score" ? "highest score first" : "newest first"}`}
             </p>
           </div>
-          <div className="flex border border-line bg-cream p-0.5" role="group" aria-label="Sort saved videos">
+          <div className="flex border border-line bg-cream p-0.5" role="group" aria-label="Sort saved ratings">
             <Button
               type="button"
               size="sm"
@@ -196,6 +204,30 @@ export function Scoreboard({
             </AlertDialogContent>
           </AlertDialog>
         </div>
+        {presentKinds.length > 1 ? (
+          <div className="flex flex-wrap gap-1" role="group" aria-label="Filter by type">
+            {[{ id: "all" as const, label: "All" }, ...presentKinds].map((kind) => {
+              const active = activeFilter === kind.id
+              return (
+                <Button
+                  key={kind.id}
+                  type="button"
+                  size="xs"
+                  variant={active ? "default" : "outline"}
+                  aria-pressed={active}
+                  onClick={() => setFilter(kind.id)}
+                  className={
+                    active
+                      ? "h-7 px-2 text-[10px]"
+                      : "h-7 border-line bg-cream px-2 text-[10px] text-bark hover:text-ink"
+                  }
+                >
+                  [{kind.label}]
+                </Button>
+              )
+            })}
+          </div>
+        ) : null}
         {message ? (
           <p className="text-xs text-bark" role="status">
             <span className="text-clay">&gt; </span>
@@ -208,6 +240,10 @@ export function Scoreboard({
         <div className="border border-dashed border-line bg-paper/60 px-6 py-14 text-center">
           <p className="font-heading text-xl font-bold uppercase">Loading ratings<span className="cursor-blink text-clay">_</span></p>
           <p className="mx-auto mt-2 max-w-sm text-sm text-bark">Checking this account.</p>
+        </div>
+      ) : entries.length > 0 && visible.length === 0 ? (
+        <div className="border border-dashed border-line bg-paper/60 px-6 py-14 text-center">
+          <p className="font-heading text-xl font-bold uppercase">Nothing of that type</p>
         </div>
       ) : visible.length === 0 ? (
         <div className="border border-dashed border-line bg-paper/60 px-6 py-14 text-center">
@@ -250,6 +286,9 @@ function ScoreRow({
     <article className="border border-line bg-paper px-4 py-4 transition-colors hover:border-clay/50 sm:px-5 sm:py-5">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
+          <p className="mb-1.5 text-[10px] font-semibold tracking-[0.16em] text-clay uppercase">
+            [{kindLabel(entry.kind)}]
+          </p>
           <h3 className="text-lg leading-snug break-words">{label}</h3>
           {entry.url ? (
             href ? (

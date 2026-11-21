@@ -1,8 +1,10 @@
 import { CRITERIA, type CriterionId, type ScoreMap } from "./criteria.ts"
+import { normalizeKind, type Kind } from "./kinds.ts"
 import { scoreRatings } from "./score.ts"
 
 export type Entry = {
   id: string
+  kind: Kind
   title: string
   url: string
   date: string
@@ -54,16 +56,16 @@ export function mergeEntries(existing: Entry[], incoming: Entry[]): {
 
 export function describeImport(added: number, duplicate: number, skipped: number): string {
   if (added === 0 && duplicate === 0 && skipped === 0) {
-    return "That backup doesn’t include any videos."
+    return "That backup doesn’t include any ratings."
   }
   if (added === 0 && skipped === 0) {
     return duplicate === 1
-      ? "That video is already on the scoreboard."
-      : "Those videos are already on the scoreboard."
+      ? "That rating is already on the scoreboard."
+      : "Those ratings are already on the scoreboard."
   }
 
   const parts: string[] = []
-  if (added > 0) parts.push(`Added ${added} ${added === 1 ? "video" : "videos"}.`)
+  if (added > 0) parts.push(`Added ${added} ${added === 1 ? "rating" : "ratings"}.`)
   if (duplicate > 0) {
     parts.push(`${duplicate} ${duplicate === 1 ? "was" : "were"} already saved.`)
   }
@@ -143,6 +145,7 @@ function normalizeEntry(raw: unknown): Entry | null {
   if (!raw || typeof raw !== "object") return null
   const record = raw as {
     id?: unknown
+    kind?: unknown
     title?: unknown
     url?: unknown
     date?: unknown
@@ -156,11 +159,12 @@ function normalizeEntry(raw: unknown): Entry | null {
   if (!date || Number.isNaN(Date.parse(date))) return null
 
   const id = cleanId(record.id)
+  const kind = normalizeKind(record.kind)
   const title = cleanText(record.title, 200)
   const url = cleanText(record.url, 2000)
   const total = scoreRatings(scores).total
 
-  return { id, title, url, date, scores, total }
+  return { id, kind, title, url, date, scores, total }
 }
 
 function normalizeScores(raw: unknown): ScoreMap | null {

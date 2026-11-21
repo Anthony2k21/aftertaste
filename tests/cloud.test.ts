@@ -9,6 +9,7 @@ import { localImportChoice, rememberLocalImport } from "../src/lib/storage.ts"
 
 const sample: Entry = {
   id: "11111111-1111-4111-8111-111111111111",
+  kind: "podcast",
   title: "  Talk  ",
   url: "https://example.com/watch",
   date: "2026-11-20T12:00:00.000Z",
@@ -86,7 +87,26 @@ describe("rating rows", () => {
     assert.equal(parsed.entries[0]?.title, "Talk")
     assert.equal(parsed.entries[0]?.total, 60)
     assert.equal(parsed.entries[0]?.date, "2026-11-20T12:00:00.000Z")
+    assert.equal(parsed.entries[0]?.kind, "podcast")
+    assert.equal("kind" in (parsed.entries[0]?.scores ?? {}), false)
     assert.equal(row.user_id, "user-1")
+  })
+})
+
+describe("rows saved before types existed", () => {
+  it("load as Video", () => {
+    const parsed = entriesFromRows([
+      {
+        id: "legacy",
+        title: "Old clip",
+        url: "",
+        scores: sample.scores,
+        total: 60,
+        created_at: "2026-11-19T12:00:00.000Z",
+      },
+    ])
+    assert.equal(parsed.entries.length, 1)
+    assert.equal(parsed.entries[0]?.kind, "video")
   })
 })
 
