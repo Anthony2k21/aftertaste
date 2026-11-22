@@ -12,6 +12,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { CollapseToggle } from "@/components/CollapseToggle"
 import { SectionTitle } from "@/components/SectionTitle"
 import { CRITERIA } from "@/lib/criteria"
 import {
@@ -36,6 +37,12 @@ type ScoreboardProps = {
   emptyHint: string
   onDelete: (id: string) => Promise<void> | void
   onReplace: (entries: Entry[]) => Promise<void> | void
+  index: string
+  collapsed: boolean
+  onToggle: () => void
+  collapsedCards: Set<string>
+  onCardCollapse: (id: string, collapsed: boolean) => void
+  onCardsCollapse: (ids: string[], collapsed: boolean) => void
 }
 
 export function Scoreboard({
@@ -45,6 +52,12 @@ export function Scoreboard({
   emptyHint,
   onDelete,
   onReplace,
+  index,
+  collapsed,
+  onToggle,
+  collapsedCards,
+  onCardCollapse,
+  onCardsCollapse,
 }: ScoreboardProps) {
   const fileRef = useRef<HTMLInputElement>(null)
   const [sort, setSort] = useState<SortKey>("score")
@@ -58,6 +71,7 @@ export function Scoreboard({
     activeFilter === "all" ? entries : entries.filter((entry) => entry.kind === activeFilter),
     sort,
   )
+  const allCollapsed = visible.length > 0 && visible.every((entry) => collapsedCards.has(entry.id))
 
   async function run(action: () => Promise<void> | void, success: string) {
     setPending(true)
@@ -111,14 +125,15 @@ export function Scoreboard({
       <div className="flex flex-col gap-4">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <SectionTitle index="03">Scoreboard</SectionTitle>
+            <SectionTitle index={index}>Scoreboard</SectionTitle>
             <p className="mt-1.5 text-[11px] font-semibold tracking-[0.16em] text-bark uppercase">
               {entries.length === 0
                 ? "Nothing saved yet"
                 : `${activeFilter === "all" ? entries.length : `${visible.length} of ${entries.length}`} saved · ${sort === "score" ? "highest score first" : "newest first"}`}
             </p>
           </div>
-          <div className="flex border border-line bg-cream p-0.5" role="group" aria-label="Sort saved ratings">
+          <div className="flex items-center gap-2">
+          <div className="flex border border-line bg-cream p-0.5" role="group" aria-label="Sort saved ratings" hidden={collapsed}>
             <Button
               type="button"
               size="sm"
@@ -140,7 +155,10 @@ export function Scoreboard({
               Date
             </Button>
           </div>
+          <CollapseToggle collapsed={collapsed} onToggle={onToggle} label="scoreboard" controls="scoreboard-body" />
+          </div>
         </div>
+        <div id="scoreboard-body" className="flex flex-col gap-4" hidden={collapsed}>
         <div className="flex flex-wrap gap-2">
           <Button
             type="button"
@@ -161,6 +179,17 @@ export function Scoreboard({
             disabled={pending || loading}
           >
             Import JSON
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="bg-paper"
+            onClick={() => onCardsCollapse(visible.map((entry) => entry.id), !allCollapsed)}
+            disabled={visible.length === 0}
+            aria-label={allCollapsed ? "Expand all cards" : "Collapse all cards"}
+          >
+            {allCollapsed ? "[+] Expand all" : "[–] Collapse all"}
           </Button>
           <input
             ref={fileRef}
@@ -235,6 +264,9 @@ export function Scoreboard({
           </p>
         ) : null}
       </div>
+      </div>
+
+      <div hidden={collapsed}>
 
       {loading ? (
         <div className="border border-dashed border-line bg-paper/60 px-6 py-14 text-center">
@@ -257,6 +289,8 @@ export function Scoreboard({
               <ScoreRow
                 entry={entry}
                 pending={pending}
+                collapsed={collapsedCards.has(entry.id)}
+                onToggle={() => onCardCollapse(entry.id, !collapsedCards.has(entry.id))}
                 onDelete={(id) => {
                   void run(() => onDelete(id), "Removed from the scoreboard.")
                 }}
@@ -265,6 +299,7 @@ export function Scoreboard({
           ))}
         </ul>
       )}
+      </div>
     </section>
   )
 }
@@ -272,23 +307,44 @@ export function Scoreboard({
 function ScoreRow({
   entry,
   pending,
+  collapsed,
+  onToggle,
   onDelete,
 }: {
   entry: Entry
   pending: boolean
+  collapsed: boolean
+  onToggle: () => void
   onDelete: (id: string) => void
 }) {
   const href = hrefFor(entry.url)
   const label = entry.title.trim() || "Untitled"
   const tier = tierFor(entry.total)
+  const bodyId = `entry-${entry.id}`
+
+  if (collapsed) {
+    return (
+      <article className="flex items-center gap-3 border border-line bg-paper py-1.5 pr-1.5 pl-4 transition-colors hover:border-clay/50 sm:pl-5">
+        <span className="shrink-0 text-[10px] font-semibold tracking-[0.16em] text-clay uppercase">
+          [{kindLabel(entry.kind)}]
+        </span>
+        <h3 className="min-w-0 flex-1 truncate text-sm leading-snug">{label}</h3>
+        <span className="shrink-0 font-sans text-lg leading-none font-bold text-clay tabular-nums">{entry.total}</span>
+        <CollapseToggle collapsed onToggle={onToggle} label={label} controls={bodyId} size="sm" />
+      </article>
+    )
+  }
 
   return (
-    <article className="border border-line bg-paper px-4 py-4 transition-colors hover:border-clay/50 sm:px-5 sm:py-5">
+    <article id={bodyId} className="border border-line bg-paper px-4 py-4 transition-colors hover:border-clay/50 sm:px-5 sm:py-5">
+      <div className="mb-1.5 flex items-center justify-between gap-3">
+        <p className="text-[10px] font-semibold tracking-[0.16em] text-clay uppercase">
+          [{kindLabel(entry.kind)}]
+        </p>
+        <CollapseToggle collapsed={false} onToggle={onToggle} label={label} controls={bodyId} size="sm" />
+      </div>
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <p className="mb-1.5 text-[10px] font-semibold tracking-[0.16em] text-clay uppercase">
-            [{kindLabel(entry.kind)}]
-          </p>
           <h3 className="text-lg leading-snug break-words">{label}</h3>
           {entry.url ? (
             href ? (

@@ -1,4 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card"
+import { CollapseToggle } from "@/components/CollapseToggle"
 import { SectionTitle } from "@/components/SectionTitle"
 import { CRITERIA } from "@/lib/criteria"
 
@@ -10,11 +11,24 @@ const TIERS = [
   ["Under 40", "Skip"],
 ] as const
 
-export function ScoringGuide() {
+export function ScoringGuide({
+  index,
+  collapsed = false,
+  onToggle,
+}: {
+  index: string
+  collapsed?: boolean
+  onToggle?: () => void
+}) {
   return (
     <section className="flex flex-col gap-4">
-      <SectionTitle index="02">How scoring works</SectionTitle>
-      <Card className="shadow-none [--card-spacing:--spacing(5)] sm:[--card-spacing:--spacing(7)]">
+      <div className="flex items-center justify-between gap-3">
+        <SectionTitle index={index}>How scoring works</SectionTitle>
+        {onToggle ? (
+          <CollapseToggle collapsed={collapsed} onToggle={onToggle} label="scoring guide" controls="guide-body" />
+        ) : null}
+      </div>
+      <Card id="guide-body" hidden={collapsed} className="shadow-none [--card-spacing:--spacing(5)] sm:[--card-spacing:--spacing(7)]">
         <CardContent className="gap-6 text-sm leading-relaxed text-bark">
           <p>
             A rating of 1 adds nothing. A rating of 5 adds that row’s full weight.

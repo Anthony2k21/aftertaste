@@ -4,6 +4,8 @@ A small way to rate media and experiences: videos, music, films and TV, books, g
 
 The look is a dark, square, terminal-style UI: near-black panels with 1px rules, an amber accent, zero rounded corners, Space Grotesk uppercase headings and JetBrains Mono for everything else, blocky 1–5 rating buttons, and a bracketed, segmented score readout. It is built to work on a phone as well as a desktop.
 
+A **Stats** section works out patterns from your saved ratings once you have 3 or more: average score by type, the average for each criterion with the weakest flagged, which criterion tracks your total most closely, how late-night entries (00:00–04:59) compare with the rest, your top and bottom three, and how many entries have no title. Every section, and every scoreboard card, has a `[–]`/`[+]` toggle to minimise it, and the scoreboard has Collapse all / Expand all.
+
 Signed-in ratings sync across devices through Supabase. With no Supabase env vars, or while signed out, ratings stay in this browser’s `localStorage`. After the first sign-in, the app offers once to copy those browser ratings onto the account.
 
 Anthony creates the Supabase project and connects the repo to Vercel. Both need his accounts. The steps below are the whole setup.
@@ -98,6 +100,7 @@ npm run preview
 - Signed in: those actions read and write the `ratings` table. The scoreboard is the account, not the browser cache.
 - The first time an account signs in on a browser that already has local ratings, the app asks once to add them to the account. **Add to my account** copies them. **Not now** leaves them local and does not ask again on this browser. JSON import still works later.
 - The type is stored inside the `scores` JSON as `kind`, so the table needs no new column. Ratings saved before types existed (in the browser or in Supabase) load as Video.
+- Collapsed panels and cards are remembered in this browser under `aftertaste.ui.v1`. They are not synced.
 - Totals are calculated again when rows are loaded, so a stored `total` cannot drift from the formula.
 
 ## Scoring

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { CollapseToggle } from "@/components/CollapseToggle"
 import { SectionTitle } from "@/components/SectionTitle"
 import {
   CRITERIA,
@@ -21,9 +22,17 @@ type RatingFormProps = {
   onSave: (entry: Entry) => Promise<string | null> | string | null
   savedLabel: string
   holdMessage?: string | null
+  collapsed?: boolean
+  onToggle?: () => void
 }
 
-export function RatingForm({ onSave, savedLabel, holdMessage = null }: RatingFormProps) {
+export function RatingForm({
+  onSave,
+  savedLabel,
+  holdMessage = null,
+  collapsed = false,
+  onToggle,
+}: RatingFormProps) {
   const titleRef = useRef<HTMLInputElement>(null)
   const [kind, setKind] = useState<Kind>(DEFAULT_KIND)
   const [title, setTitle] = useState("")
@@ -72,12 +81,17 @@ export function RatingForm({ onSave, savedLabel, holdMessage = null }: RatingFor
   return (
     <Card className="shadow-none [--card-spacing:--spacing(5)] sm:[--card-spacing:--spacing(8)]">
       <CardHeader>
-        <SectionTitle index="01">Rate something</SectionTitle>
-        <p className="mt-1 text-sm leading-relaxed text-bark">
+        <div className="flex items-center justify-between gap-3">
+          <SectionTitle index="01">Rate something</SectionTitle>
+          {onToggle ? (
+            <CollapseToggle collapsed={collapsed} onToggle={onToggle} label="rating form" controls="rate-body" />
+          ) : null}
+        </div>
+        <p className="mt-1 text-sm leading-relaxed text-bark" hidden={collapsed}>
           Anything you watched, heard, read, played or lived. Title and link can stay blank; the score comes from the seven ratings.
         </p>
       </CardHeader>
-      <CardContent>
+      <CardContent id="rate-body" hidden={collapsed}>
         <form className="flex flex-col gap-8" onSubmit={onSubmit} noValidate>
           <div className="grid gap-5">
             <KindPicker value={kind} onChange={(next) => {

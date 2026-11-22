@@ -6,6 +6,7 @@ import { ImportOffer } from "@/components/ImportOffer"
 import { RatingForm } from "@/components/RatingForm"
 import { Scoreboard } from "@/components/Scoreboard"
 import { ScoringGuide } from "@/components/ScoringGuide"
+import { Stats } from "@/components/Stats"
 import type { Entry } from "@/lib/entries"
 import {
   clearRatings,
@@ -21,6 +22,7 @@ import {
   persistEntries,
   rememberLocalImport,
 } from "@/lib/storage"
+import { useUiState } from "@/lib/use-ui-state"
 
 const configured = isSupabaseConfigured()
 
@@ -33,6 +35,7 @@ export default function App() {
   const [importOffer, setImportOffer] = useState<Entry[] | null>(null)
   const [importing, setImporting] = useState(false)
 
+  const ui = useUiState()
   const entriesRef = useRef(entries)
   const userRef = useRef(user)
 
@@ -242,8 +245,21 @@ export default function App() {
           onSave={saveEntry}
           savedLabel={signedIn ? "Saved to your account." : "Saved in this browser."}
           holdMessage={configured && !authReady ? "Checking sign-in…" : null}
+          collapsed={ui.isSectionCollapsed("form")}
+          onToggle={() => ui.toggleSection("form")}
         />
-        <ScoringGuide />
+        <ScoringGuide
+          index="02"
+          collapsed={ui.isSectionCollapsed("guide")}
+          onToggle={() => ui.toggleSection("guide")}
+        />
+        <Stats
+          index="03"
+          entries={entries}
+          loading={configured && !listReady}
+          collapsed={ui.isSectionCollapsed("stats")}
+          onToggle={() => ui.toggleSection("stats")}
+        />
         <Scoreboard
           entries={entries}
           loading={configured && !listReady}
@@ -255,6 +271,12 @@ export default function App() {
           }
           onDelete={removeEntry}
           onReplace={replaceEntries}
+          index="04"
+          collapsed={ui.isSectionCollapsed("scoreboard")}
+          onToggle={() => ui.toggleSection("scoreboard")}
+          collapsedCards={ui.collapsedCards}
+          onCardCollapse={ui.setCardCollapsed}
+          onCardsCollapse={ui.setCardsCollapsed}
         />
 
         <footer className="border-t border-line pt-6 text-xs leading-relaxed text-bark">
